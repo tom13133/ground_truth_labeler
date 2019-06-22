@@ -69,34 +69,17 @@ void makeBoxControl(InteractiveMarker &msg) {
   // Triangle model
   line_marker.type = Marker::LINE_STRIP;
   line_marker.action = visualization_msgs::Marker::ADD;
-  line_marker.header.frame_id = "velodyne";
-  line_marker.header.stamp = ros::Time::now();
-  line_marker.ns = "visualization";
-  line_marker.id = 1;
 
-  line_marker.pose.position.x = 0;
-  line_marker.pose.position.y = 0;
-  line_marker.pose.position.z = 0;
-  line_marker.pose.orientation.x = 0;
-  line_marker.pose.orientation.y = 0;
-  line_marker.pose.orientation.z = 0;
-  line_marker.pose.orientation.w = 1;
-
-  line_marker.scale.x = 0.01;
+  line_marker.scale.x = 0.02;
 
   line_marker.color.r = 1.0;
   line_marker.color.g = 1.0;
   line_marker.color.b = 1.0;
   line_marker.color.a = 1.0;
 
-  Eigen::Matrix4d trans = Eigen::Matrix4d::Identity();
-  trans.block<3,1>(0,3) = Eigen::Vector3d(points[idx].position.x, points[idx].position.y, points[idx].position.z);
-  Eigen::Quaterniond q(points[idx].orientation.w, points[idx].orientation.x, points[idx].orientation.y, points[idx].orientation.z);
-  trans.block<3,3>(0,0) = q.matrix();
-
-  Eigen::Vector4d p1 = trans.matrix() * Eigen::Vector4d(0, 0, 0.6, 1);
-  Eigen::Vector4d p2 = trans.matrix() * Eigen::Vector4d(+0.5196, 0, -0.3, 1);
-  Eigen::Vector4d p3 = trans.matrix() * Eigen::Vector4d(-0.5196, 0, -0.3, 1);
+  Eigen::Vector4d p1 = Eigen::Vector4d(0, 0, 0.6, 1);
+  Eigen::Vector4d p2 = Eigen::Vector4d(+0.5196, 0, -0.3, 1);
+  Eigen::Vector4d p3 = Eigen::Vector4d(-0.5196, 0, -0.3, 1);
 
   geometry_msgs::Point p1_, p2_, p3_;
   p1_.x = p1.x();
