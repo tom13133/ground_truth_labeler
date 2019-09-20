@@ -7,6 +7,7 @@
 #include <vector>
 #include <Eigen/Dense>
 #include "Eigen/Eigen"
+#include <eigen_conversions/eigen_msg.h>
 #include <interactive_markers/interactive_marker_server.h>
 
 using namespace visualization_msgs;
@@ -15,6 +16,7 @@ interactive_markers::InteractiveMarkerServer *_server;
 geometry_msgs::TransformStamped transform;
 std::string time_stamp;
 std::vector<geometry_msgs::Pose> points;
+
 
 void processFeedback(const InteractiveMarkerFeedbackConstPtr &feedback) {
   ROS_INFO_STREAM(feedback->marker_name << " is now at "
@@ -31,14 +33,15 @@ void processFeedback(const InteractiveMarkerFeedbackConstPtr &feedback) {
   points[index] = point;
 }
 
+
 void tfCallback(const tf2_msgs::TFMessage &msg) {
   transform = msg.transforms[0];
 }
-  
+
 
 void makeBoxControl(InteractiveMarker &msg) {
   int idx = points.size() - 1;
-  Marker marker, line_marker, text_marker;
+  Marker marker, line_marker, text_marker, left_marker;
 
   // center sphere
   marker.type = Marker::SPHERE;
@@ -99,13 +102,27 @@ void makeBoxControl(InteractiveMarker &msg) {
   line_marker.points.push_back(p3_);
   line_marker.points.push_back(p1_);
 
+  // left sphere
+  left_marker.type = Marker::SPHERE;
+  left_marker.scale.x = 0.05;
+  left_marker.scale.y = 0.05;
+  left_marker.scale.z = 0.05;
+  left_marker.color.r = 0.0;
+  left_marker.color.g = 1.0;
+  left_marker.color.b = 1.0;
+  left_marker.color.a = 1.0;
+
+  left_marker.pose.position.x = p3.x();
+  left_marker.pose.position.y = p3.y();
+  left_marker.pose.position.z = p3.z();
 
   InteractiveMarkerControl box_control;
   box_control.always_visible = true;
 
-  box_control.markers.push_back( marker );
-  box_control.markers.push_back( text_marker );
-  box_control.markers.push_back( line_marker );
+  box_control.markers.push_back(marker);
+  box_control.markers.push_back(text_marker);
+  box_control.markers.push_back(line_marker);
+  box_control.markers.push_back(left_marker);
   msg.controls.push_back(box_control);
 
   InteractiveMarkerControl control;
@@ -191,8 +208,6 @@ void navCallback(const geometry_msgs::PoseStamped msg) {
       int_marker.header.stamp = ros::Time::now();
       int_marker.name = std::to_string(points.size());
       int_marker.description = "";
-
-      
       int_marker.pose.position.x = i * 2;
       int_marker.pose.position.y = 0;
       int_marker.pose.position.z = 0;
@@ -207,7 +222,7 @@ void navCallback(const geometry_msgs::PoseStamped msg) {
     }
   }
   else if (choice == 2) {
-    std::cout<<"Please input the ID you want to erase:"<<std::endl;
+    std::cout << "Please input the ID you want to erase:" << std::endl;
     int erase_id;
     scanf("%d", &erase_id);
     _server->erase(std::to_string(erase_id));
@@ -217,8 +232,10 @@ void navCallback(const geometry_msgs::PoseStamped msg) {
     points[erase_id].position.z = -1000;
   }
   else if (choice == 3) {
-    for(int i = 0; i < points.size(); i++) {
-      if (points[i].position.x == -1000 && points[i].position.y == -1000 && points[i].position.z == -1000) {
+    for (int i = 0; i < points.size(); i++) {
+      if (points[i].position.x == -1000
+          && points[i].position.y == -1000
+          && points[i].position.z == -1000) {
         continue;
       }
       else {
@@ -226,12 +243,39 @@ void navCallback(const geometry_msgs::PoseStamped msg) {
           std::cout << time_stamp << ", ";
         std::cout << i << ", " << points[i].position.x << ", "
                                << points[i].position.y << ", "
-                               << points[i].position.z << std::endl;
+                               << points[i].position.z;
+        InteractiveMarker int_marker;
+        if (_server->get(std::to_string(i), int_marker)) {
+          Marker line_marker = int_marker.controls[0].markers[2];
+          geometry_msgs::Point p1_, p2_, p3_;
+          p1_ = line_marker.points[0];
+          p2_ = line_marker.points[1];
+          p3_ = line_marker.points[2];
+          Eigen::Isometry3d T;
+          tf::poseMsgToEigen(points[i], T);
+          Eigen::Vector3d p1, p2, p3;
+          tf::pointMsgToEigen(p1_, p1);
+          tf::pointMsgToEigen(p2_, p2);
+          tf::pointMsgToEigen(p3_, p3);
+          p1 = T * p1;
+          p2 = T * p2;
+          p3 = T * p3;
+
+          std::cout << ", " << p1.x() << ", "
+                            << p1.y() << ", "
+                            << p1.z();
+          std::cout << ", " << p2.x() << ", "
+                            << p2.y() << ", "
+                            << p2.z();
+          std::cout << ", " << p3.x() << ", "
+                            << p3.y() << ", "
+                            << p3.z() << std::endl;
+        }
       }
     }
   }
   else {
-    std::cout<<"Do nothing."<<std::endl;
+    std::cout << "Do nothing." << std::endl;
   }
   _server->applyChanges();
 }

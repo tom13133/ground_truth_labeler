@@ -8,6 +8,7 @@ project(ground_truth_labeler)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  eigen_conversions
   roscpp
   rospy
   std_msgs
