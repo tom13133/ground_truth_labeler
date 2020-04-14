@@ -80,9 +80,10 @@ void makeBoxControl(InteractiveMarker &msg) {
   line_marker.color.b = 1.0;
   line_marker.color.a = 1.0;
 
-  Eigen::Vector4d p1 = Eigen::Vector4d(0, 0, 0.6, 1);
-  Eigen::Vector4d p2 = Eigen::Vector4d(+0.5196, 0, -0.3, 1);
-  Eigen::Vector4d p3 = Eigen::Vector4d(-0.5196, 0, -0.3, 1);
+  double h = 0.9;
+  Eigen::Vector4d p1 = Eigen::Vector4d(0, 0, h/3*2, 1);
+  Eigen::Vector4d p2 = Eigen::Vector4d(+h/std::sqrt(3), 0, -h/3, 1);
+  Eigen::Vector4d p3 = Eigen::Vector4d(-h/std::sqrt(3), 0, -h/3, 1);
 
   geometry_msgs::Point p1_, p2_, p3_;
   p1_.x = p1.x();
@@ -204,7 +205,7 @@ void navCallback(const geometry_msgs::PoseStamped msg) {
     scanf("%d", &number);
     for (int i = 0; i < number; i++) {
       InteractiveMarker int_marker;
-      int_marker.header.frame_id = "velodyne";
+      int_marker.header.frame_id = "map";
       int_marker.header.stamp = ros::Time::now();
       int_marker.name = std::to_string(points.size());
       int_marker.description = "";
