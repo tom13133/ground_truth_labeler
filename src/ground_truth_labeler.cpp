@@ -1,7 +1,6 @@
 #include <ros/ros.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/TransformStamped.h>
-#include <tf2_msgs/TFMessage.h>
 #include <geometry_msgs/Point.h>
 #include <std_msgs/String.h>
 #include <vector>
@@ -31,11 +30,6 @@ void processFeedback(const InteractiveMarkerFeedbackConstPtr &feedback) {
   point = feedback->pose;
   int index = std::stoi(feedback->marker_name);
   points[index] = point;
-}
-
-
-void tfCallback(const tf2_msgs::TFMessage &msg) {
-  transform = msg.transforms[0];
 }
 
 
@@ -281,16 +275,10 @@ void navCallback(const geometry_msgs::PoseStamped msg) {
   _server->applyChanges();
 }
 
-void stampCallback(const std_msgs::String& stamp) {
-  time_stamp = stamp.data;
-}
-
 int main(int argc, char** argv) {
   ros::init(argc, argv, "simple_marker");
   ros::NodeHandle n;
   ros::Subscriber sub_nav = n.subscribe("/move_base_simple/goal", 1, navCallback);
-  ros::Subscriber sub_tf = n.subscribe("/tf", 1, tfCallback);
-  ros::Subscriber sub_stamp = n.subscribe("/visualizer_node/stamp", 1, stampCallback);
 
   interactive_markers::InteractiveMarkerServer server("simple_marker");
   _server = &server;
