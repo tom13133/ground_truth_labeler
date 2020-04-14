@@ -11,7 +11,7 @@ This package is to mark the triangle model on RVIZ and output its location of ce
 ## 1. ground_truth_labeler_node
 
 ### (a) Getting Started.
-1. catkin_make the package  
+1. put package **ground_truth_labeler** in your workspace and catkin_make the package.  
 
 2. Run the node  
 ```
@@ -23,6 +23,7 @@ rosrun ground_truth_labeler ground_truth_labeler_node
 1. Open the RVIZ  
 2. Set fixed frame as **map**  
 3. Subscribe the topic **iterativemarkers**   
+
 You won't see anything for now, you need to create the marker by orders.  
 
 ### (c) Create the first model
@@ -30,8 +31,10 @@ You won't see anything for now, you need to create the marker by orders.
 2. Try to drag the green arrow on the RVIZ 3D space.  
 3. Now check the terminal you run the **ground_truth_labeler_node**, following the orders to create the model.  
 
-2. Play the bag, then start processing.  
-After bag is finished, one output file **pose.csv** would be generated in ```~/target_processing/data/```. It contains the pose with timestamp:  
-(**List order**: time_stamp, x, y, z, qw, qx, qy, qz)   
+For instance, you can create one model by giving such orders:  
+<img src="https://github.com/tom13133/ground_truth_labeler/blob/master/images/orders.png" width="900">
 
+The movable model shown on the RVIZ:  
+<img src="https://github.com/tom13133/ground_truth_labeler/blob/master/images/triangle_model.png" width="500">
 
+4. Want to give more orders, back to step 1.
